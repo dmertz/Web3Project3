@@ -1,11 +1,21 @@
 <?php
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$theID = $_POST['theID'];
-		$quantity = $_POST['quantity'];
+		$quantity = $_POST['quantityToBuy'];
 		
-		// Update cookies only.
+		$cookie_name = "ShoppingCart";
+		$cookie_value = "";
 		
-		header("Location:index.php?" . $theID . mysqli_error($con));
+		// Cookie is stored as comma separated values.
+		// If there is already a cookie, add a comma to the end before adding the new stuff to the cart.
+		if(isset($_COOKIE[$cookie_name])) {
+			$cookie_value = $_COOKIE[$cookie_name] . ",";
+		}
+		
+		$cookie_value = $cookie_value . $theID . "," . $quantity;
+		setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+		
+		header("Location:search.php?" . $theID . mysqli_error($con));
 	}
 	else
 	{
@@ -13,6 +23,7 @@
 		<!DOCTYPE html>
 			<html>
 			<head>
+				<meta name="robots" content="noindex,nofollow" />
 				<meta charset="UTF-8">
 				<title>Add To Cart</title>
 			</head>
@@ -20,7 +31,6 @@
 		<?php
 	
 		$theID = $_GET['theID'];
-
 
 		//Create connection
 		$con = mysqli_connect("localhost", "root", "", "project3");
@@ -41,10 +51,17 @@
 			echo '<form method="post" action="';
 			echo htmlspecialchars($_SERVER["PHP_SELF"]);
 			echo '">';
+			
+		echo "Band Name: <b>" . $row['BandName'] . "</b><br>";
+		echo "Album Name: " . $row['AlbumName'] . "<br>";
+		echo "Price: $" . $row['Price'] . "<br>";
+		echo "Quantity Available: ". $row['QuantityAvailable'] . "<br>";
+		echo "Description: " . $row['Description'] . "<br>";
+		echo "Format: " . $row['Format'] . "<br>" ;
 
-		echo 'Quantity to buy: <input type="text" name="quantityToBuy" value=' . $row['notes'] . '><br>';
+		echo 'Quantity to buy: <input type="text" name="quantityToBuy" value="1"><br>';
 		echo '<input type="hidden" name="theID" value="' . $theID . '"></input>';
-		echo '<input type="submit">';
+		echo '<input type="submit" value="Add To Cart"></input>';
 	}
 	
 	mysqli_close($con);
