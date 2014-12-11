@@ -37,4 +37,4 @@
 		
 		header("Location:search.php?theID=" . $theID);
 	}
-	?>
+?>
