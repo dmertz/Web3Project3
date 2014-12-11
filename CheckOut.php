@@ -164,7 +164,7 @@
 			echo "Shipping Cost: $<label id='shipCost'>" . $shipping . "</label><br>";
 			
 			$total = $subtotal + $shipping;;
-			echo "Total Cost: $" . $total;
+			echo "Total Cost: $<label id='totalCost'>" . $total."</label>";
 		
 			mysqli_close($con);
 	}
@@ -196,7 +196,11 @@
 					break;
 				}
 			}
-			document.getElementById('shipCost').value = shippingCost;
+			document.getElementById('shipCost').innerHTML = shippingCost;
+			<?php
+			echo "var subtotal = " . $subtotal . ";";
+			echo "document.getElementById('totalCost').innerHTML = shippingCost + subtotal;";
+			?>
 		};
 		</script>
 		</form>
