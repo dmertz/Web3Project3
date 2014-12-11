@@ -5,17 +5,50 @@
 		
 		$cookie_name = "ShoppingCart";
 		$cookie_value = "";
+		$newCookieValue = "";
+		$wasUpdated = false;
 		
 		// Cookie is stored as comma separated values.
-		// If there is already a cookie, add a comma to the end before adding the new stuff to the cart.
 		if(isset($_COOKIE[$cookie_name])) {
-			$cookie_value = $_COOKIE[$cookie_name] . ",";
+			$cookie_value = $_COOKIE[$cookie_name];
+
+			// Check if this item is already in the cart.
+			$token = strtok($cookie_value, ",");
+
+			while ($token !== false)
+			{
+				if ($newCookieValue != "")
+				{
+					$newCookieValue = $newCookieValue . ",";
+				}
+				$newCookieValue = $newCookieValue . $token;
+				
+				if ($token == $theID)
+				{
+					$token = strtok( ",");
+					// Update the amount
+					$wasUpdated = true;
+					$newCookieValue = $newCookieValue . "," . $quantity;
+				}
+				else
+				{
+					$token = strtok( ",");
+					$newCookieValue = $newCookieValue . "," . $token;
+				}
+				$token = strtok( ",");
+			}
 		}
+		if (!$wasUpdated)
+		{
+			if ($newCookieValue != "")
+			{
+				$newCookieValue = $newCookieValue . ",";
+			}
+			$newCookieValue = $newCookieValue . $theID . "," . $quantity;
+		}
+		setcookie($cookie_name, $newCookieValue, time() + (86400 * 30), "/"); // 86400 = 1 day
 		
-		$cookie_value = $cookie_value . $theID . "," . $quantity;
-		setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
-		
-		header("Location:search.php?" . $theID . mysqli_error($con));
+		header("Location:search.php?theID=" . $theID);
 	}
 	else
 	{
