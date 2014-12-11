@@ -27,7 +27,7 @@
 	while($row = mysqli_fetch_array($result)) {
 		echo "<tr>";
 		echo "<td><a href='AddToCart.php?theID=" . $row['ID'] . "'><button>Add To Cart</button></a></td>";
-		echo "<td><a href='delete.php?theID=" . $row['ID'] . "'><button>Remove From Cart</button></a></td>";
+		echo "<td><a href='DeleteFromCart.php?theID=" . $row['ID'] . "'><button>Remove From Cart</button></a></td>";
 		echo "<td><b>" . $row['BandName'] . "</b> (" . $row['AlbumName'] . ")</td>";
 		echo "</tr><tr>";
 		echo "<td>$" . $row['Price'] . "</td><td>" . $row['QuantityAvailable'] . " available</td><td>" . $row['Description'] . " (<i>format: " . $row['Format'] . "</i>)" ;
