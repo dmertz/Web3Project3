@@ -28,7 +28,10 @@
 		
 	if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['bandName'])) {
 		$bandName = $_GET['bandName'];
-		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE bandName like '$bandName%'";
+		$bandName = mysqli_real_escape_string($con, $bandName);
+		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE bandName like '%$bandName%'";
+		
+		echo $sql_select;
 	
 	$result = mysqli_query($con, $sql_select);
 	
