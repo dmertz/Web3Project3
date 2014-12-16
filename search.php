@@ -9,14 +9,26 @@
 	
 	echo "<h2>Music Store</h2>";
 	
+	// Search box
+	echo "<br>";
+	echo "Search for band:";
+	echo "<br>";
+	echo "<form>";
+	echo "<input name='bandName'></input>";
+	echo "<input type='submit' value='Search'></input>";
+	echo "</form>";
+	echo "<br>";
+	
 	//Create connection
 	$con = mysqli_connect("localhost", "root", "", "project3");
 	
 	// Check connection
 	if (mysqli_connect_errno())
 		echo "Failed to connect to MySQL: " . mysqli_connect_error();
-	
-	$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product";
+		
+	if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['bandName'])) {
+		$bandName = $_GET['bandName'];
+		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE bandName like '$bandName%'";
 	
 	$result = mysqli_query($con, $sql_select);
 	
@@ -36,7 +48,17 @@
 	}
 	
 	mysqli_close($con);
+	
 	?>
-
+	</table>
+	<br>
+	<a href="CheckOut.php"><button>Check Out</button></a>
+	<?php
+		}
+	else
+	{
+		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product";
+	}
+?>
     </body>
 </html>
