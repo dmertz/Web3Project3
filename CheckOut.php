@@ -154,7 +154,7 @@
 			echo htmlspecialchars($_SERVER["PHP_SELF"]);
 			echo '">';
 			
-			$shipping = 0;
+			$shipping = 10;
 					echo 'Shipping Method: <select name="shipMethod" id="shipMethod" class="required">';
 					echo '<option >UPS</option>';
 					echo '<option >USPS</option>';
@@ -171,7 +171,7 @@
 ?>
 		<script>
 		shipMethod = document.getElementById('shipMethod');
-		shipMethod.onchange= function(e){
+		shipMethod.onchange = function(e){
 			var shippingCost = 10;
 			switch (e.target.value)
 			{
