@@ -59,12 +59,10 @@
 				<meta name="robots" content="noindex,nofollow" />
 				<meta charset="UTF-8">
 				<title>Check Out</title>
+				<link rel="stylesheet" type="text/css" href="style.css">
 			</head>
 			<body>
 		<?php
-	
-		//$theID = $_GET['theID'];
-		
 		
 		$ids[0] = 0;
 		$amounts[0] = 0;
@@ -204,6 +202,8 @@
 		};
 		</script>
 		</form>
+		<br>
+		<a href='search.php'>Return to Search</a>
 	</body>
 </html>
 <?php

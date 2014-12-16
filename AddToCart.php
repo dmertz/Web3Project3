@@ -48,7 +48,7 @@
 		}
 		setcookie($cookie_name, $newCookieValue, time() + (86400 * 30), "/"); // 86400 = 1 day
 		
-		header("Location:search.php?theID=" . $theID);
+		header("Location:search.php");
 	}
 	else
 	{
@@ -59,6 +59,7 @@
 				<meta name="robots" content="noindex,nofollow" />
 				<meta charset="UTF-8">
 				<title>Add To Cart</title>
+				<link rel="stylesheet" type="text/css" href="style.css">
 			</head>
 			<body>
 		<?php
@@ -73,7 +74,7 @@
 			echo "Failed to connect to MySQL: " . mysqli_connect_error();
 		}
 		
-		// WARNING WARNING DO NOT USE THIS LIKE THIS! SQL INJECTION!
+		$theID = mysqli_real_escape_string($con, $theID);
 		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE id = $theID";
 		
 		$result = mysqli_query($con, $sql_select);
@@ -88,7 +89,7 @@
 		echo "Band Name: <b>" . $row['BandName'] . "</b><br>";
 		echo "Album Name: " . $row['AlbumName'] . "<br>";
 		echo "Price: $" . $row['Price'] . "<br>";
-		echo "Quantity Available: ". $row['QuantityAvailable'] . "<br>";
+		echo "Quantity Available: " . $row['QuantityAvailable'] . "<br>";
 		echo "Description: " . $row['Description'] . "<br>";
 		echo "Format: " . $row['Format'] . "<br>" ;
 
