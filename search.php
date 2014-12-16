@@ -51,16 +51,11 @@
 		
 		mysqli_close($con);
 		
-		?>
-		</table>
-		<br>
-		<a href="CheckOut.php"><button>Check Out</button></a>
-		<?php
-		}
-	else
-	{
-		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product";
+		echo "</table>";
 	}
-?>
+		?>
+		<br>
+		<a href="ViewCart.php"><button>View Cart</button></a>
+		<a href="CheckOut.php"><button>Check Out</button></a>
     </body>
 </html>

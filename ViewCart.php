@@ -58,7 +58,7 @@
 			<head>
 				<meta name="robots" content="noindex,nofollow" />
 				<meta charset="UTF-8">
-				<title>Check Out</title>
+				<title>View Cart</title>
 				<link rel="stylesheet" type="text/css" href="style.css">
 			</head>
 			<body>
@@ -145,60 +145,10 @@
 			}
 			
 			echo "Subtotal: $" . $subtotal . "<br>";
-			
-			echo '<form method="post" action="';
-			echo htmlspecialchars($_SERVER["PHP_SELF"]);
-			echo '">';
-			
-			$shipping = 10;
-					echo 'Shipping Method: <select name="shipMethod" id="shipMethod" class="required">';
-					echo '<option >UPS</option>';
-					echo '<option >USPS</option>';
-					echo '<option >FedEx</option>';
-					echo '<option >Drone</option>';
-				echo '</select><br>';
-			echo "Shipping Cost: $<label id='shipCost'>" . $shipping . "</label><br>";
-			
-			$total = $subtotal + $shipping;
-			echo "Total Cost: $<label id='totalCost'>" . $total."</label>";
 		
 			mysqli_close($con);
 	}
 ?>
-		<script>
-		shipMethod = document.getElementById('shipMethod');
-		shipMethod.onchange = function(e){
-			var shippingCost = 10;
-			switch (e.target.value)
-			{
-				case "UPS":
-				{
-					shippingCost = 10;
-					break;
-				}
-				case "USPS":
-				{
-					shippingCost = 11.32;
-					break;
-				}
-				case "FedEx":
-				{
-					shippingCost = 12;
-					break;
-				}
-				case "Drone":
-				{
-					shippingCost = 100;
-					break;
-				}
-			}
-			document.getElementById('shipCost').innerHTML = shippingCost;
-			<?php
-			echo "var subtotal = " . $subtotal . ";";
-			echo "document.getElementById('totalCost').innerHTML = shippingCost + subtotal;";
-			?>
-		};
-		</script>
 		</form>
 		<br>
 		<a href='search.php'><button>Return to Search</button></a>

@@ -11,34 +11,36 @@
 		// Cookie is stored as comma separated values.
 		if(isset($_COOKIE[$cookie_name])) {
 			$cookie_value = $_COOKIE[$cookie_name];
-
-			// Check if this item is already in the cart.
-			$token = strtok($cookie_value, ",");
-
-			while ($token !== false)
+			if (is_numeric(cookie_value) && cookie_value > 0)
 			{
-				if ($newCookieValue != "")
+				// Check if this item is already in the cart.
+				$token = strtok($cookie_value, ",");
+
+				while ($token !== false)
 				{
-					$newCookieValue = $newCookieValue . ",";
-				}
-				$newCookieValue = $newCookieValue . $token;
-				
-				if ($token == $theID)
-				{
+					if ($newCookieValue != "")
+					{
+						$newCookieValue = $newCookieValue . ",";
+					}
+					$newCookieValue = $newCookieValue . $token;
+					
+					if ($token == $theID)
+					{
+						$token = strtok( ",");
+						// Update the amount
+						$wasUpdated = true;
+						$newCookieValue = $newCookieValue . "," . $quantity;
+					}
+					else
+					{
+						$token = strtok( ",");
+						$newCookieValue = $newCookieValue . "," . $token;
+					}
 					$token = strtok( ",");
-					// Update the amount
-					$wasUpdated = true;
-					$newCookieValue = $newCookieValue . "," . $quantity;
 				}
-				else
-				{
-					$token = strtok( ",");
-					$newCookieValue = $newCookieValue . "," . $token;
-				}
-				$token = strtok( ",");
 			}
 		}
-		if (!$wasUpdated)
+		if (!$wasUpdated && is_numeric($quantity) && ($quantity > 0))
 		{
 			if ($newCookieValue != "")
 			{
