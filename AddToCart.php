@@ -11,34 +11,32 @@
 		// Cookie is stored as comma separated values.
 		if(isset($_COOKIE[$cookie_name])) {
 			$cookie_value = $_COOKIE[$cookie_name];
-			if (is_numeric(cookie_value) && cookie_value > 0)
-			{
-				// Check if this item is already in the cart.
-				$token = strtok($cookie_value, ",");
+			// Check if this item is already in the cart.
+			$token = strtok($cookie_value, ",");
 
-				while ($token !== false)
+			while ($token !== false)
+			{
+				if ($newCookieValue != "")
 				{
-					if ($newCookieValue != "")
-					{
-						$newCookieValue = $newCookieValue . ",";
-					}
-					$newCookieValue = $newCookieValue . $token;
-					
-					if ($token == $theID)
-					{
-						$token = strtok( ",");
-						// Update the amount
-						$wasUpdated = true;
-						$newCookieValue = $newCookieValue . "," . $quantity;
-					}
-					else
-					{
-						$token = strtok( ",");
-						$newCookieValue = $newCookieValue . "," . $token;
-					}
-					$token = strtok( ",");
+					$newCookieValue = $newCookieValue . ",";
 				}
+				$newCookieValue = $newCookieValue . $token;
+				
+				if ($token == $theID)
+				{
+					$token = strtok( ",");
+					// Update the amount
+					$wasUpdated = true;
+					$newCookieValue = $newCookieValue . "," . $quantity;
+				}
+				else
+				{
+					$token = strtok( ",");
+					$newCookieValue = $newCookieValue . "," . $token;
+				}
+				$token = strtok( ",");
 			}
+			
 		}
 		if (!$wasUpdated && is_numeric($quantity) && ($quantity > 0))
 		{
@@ -64,6 +62,7 @@
 				<link rel="stylesheet" type="text/css" href="style.css">
 			</head>
 			<body>
+			<h2>Music Store</h2>
 		<?php
 	
 		$theID = $_GET['theID'];

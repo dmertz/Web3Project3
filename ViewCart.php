@@ -62,6 +62,7 @@
 				<link rel="stylesheet" type="text/css" href="style.css">
 			</head>
 			<body>
+			<h2>Music Store</h2>
 		<?php
 		
 		$ids[0] = 0;
@@ -139,7 +140,7 @@
 				echo "Description: " . $row['Description'] . "<br>";
 				echo "Format: " . $row['Format'] . "<br>" ;
 
-				echo "Quantity to buy: " . $amount . "<br>";
+				echo "Quantity to buy: " . $amount . " <a href='AddToCart.php?theID=" . $row['ID'] . "'><button>Change Amount</button></a>" . "<br>";
 				echo 'Item Subtotal: $' . $itemSubtotal;
 				echo "<br><br>";
 			}

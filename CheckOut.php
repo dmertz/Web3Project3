@@ -62,6 +62,7 @@
 				<link rel="stylesheet" type="text/css" href="style.css">
 			</head>
 			<body>
+			<h2>Music Store</h2>
 		<?php
 		
 		$ids[0] = 0;
