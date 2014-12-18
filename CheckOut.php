@@ -66,7 +66,7 @@
 			}
 		
 			// Get price info from database
-			//Create connection
+			// Create connection
 			$con = mysqli_connect("localhost", "root", "", "project3");
 			
 			// Check connection
@@ -88,18 +88,6 @@
 			}
 				
 			// Insert record into Purchase table
-			//Table: Purchase
-		    //ID
-		    //CustomerID
-		    //OrderDate
-		    //ShipDate
-		    //ShippingMethod (UPS, USPS, FedEx)
-			
-			// Table: PurchaseProduct
-			// PurchaseID
-			// ProductID
-			// Quantity
-			
 			$sql_insert = "INSERT INTO Purchase 
 			(CustomerID, OrderDate, ShipDate, ShippingMethod) VALUES 
 			(0, '" . date('m/d/y') . "', '" . date('m/d/y', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
@@ -127,7 +115,7 @@
 			mysqli_close($con);
 
 			setcookie($cookie_name, "", time() + (86400 * 30), "/"); // 86400 = 1 day
-			//header("Location:search.php?theID=" . $theID);
+
 			?>
 			<!DOCTYPE html>
 			<html>
@@ -260,7 +248,7 @@
 			echo "Total Cost: $<label id='totalCost'>" . $total."</label><br><br>";
 		
 			mysqli_close($con);
-			//echo "<a href='CheckOut.php?final=true'><button>Finish Checkout</button></a>";
+			
 			echo "<input type='submit' value='Finish Checkout'></input>";
 			echo "</form>";
 	}
