@@ -140,7 +140,8 @@
 				echo "Description: " . $row['Description'] . "<br>";
 				echo "Format: " . $row['Format'] . "<br>" ;
 
-				echo "Quantity to buy: " . $amount . " <a href='AddToCart.php?theID=" . $row['ID'] . "'><button>Change Amount</button></a>" . "<br>";
+				echo "Quantity to buy: " . $amount . " <a href='AddToCart.php?theID=" . $row['ID'] . "'><button>Change Amount</button></a>";
+				echo "<a href='DeleteFromCart.php?theID=" . $row['ID'] . "'><button>Remove From Cart</button></a><br>";
 				echo 'Item Subtotal: $' . $itemSubtotal;
 				echo "<br><br>";
 			}
@@ -153,6 +154,7 @@
 		</form>
 		<br>
 		<a href='search.php'><button>Return to Search</button></a>
+		<a href="CheckOut.php"><button>Check Out</button></a>
 	</body>
 </html>
 <?php

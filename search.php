@@ -20,14 +20,14 @@
 	echo "</form>";
 	echo "<br>";
 	
-	//Create connection
-	$con = mysqli_connect("localhost", "root", "", "project3");
 	
-	// Check connection
-	if (mysqli_connect_errno())
-		echo "Failed to connect to MySQL: " . mysqli_connect_error();
-		
 	if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['bandName'])) {
+		//Create connection
+		$con = mysqli_connect("localhost", "root", "", "project3");
+		
+		// Check connection
+		if (mysqli_connect_errno())
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
 		$bandName = $_GET['bandName'];
 		$bandName = mysqli_real_escape_string($con, $bandName);
 		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE bandName like '%$bandName%'";
