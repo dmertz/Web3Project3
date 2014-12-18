@@ -1,7 +1,8 @@
 <?php
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$shippingMethod = $_POST['shipMethod'];
-		$shippingCost = 10; // This ensures that nobody can get free shipping by manipulating the Post variable.
+		
+		$shippingCost = 10; // This ensures that nobody can get free shipping by manipulating the Post variable to an invalid value.
 		
 		switch ($shippingMethod)
 			{
@@ -55,11 +56,14 @@
 				{
 					$idList = $idList . ",";
 				}
-				$idList = $idList . $token;
+				if (is_numeric($token))
+					$idList = $idList . $token;
+					
 				$currentID = $token;
 				
 				$token = strtok( ",");
-				$currentAmount = $token;
+				if (is_numeric($token))
+					$currentAmount = $token;
 				$amounts[$currentID] = $currentAmount;
 				
 				$token = strtok( ",");
@@ -72,7 +76,8 @@
 			// Check connection
 			if (mysqli_connect_errno())
 				echo "Failed to connect to MySQL: " . mysqli_connect_error();
-				
+			
+			$shippingMethod = mysqli_real_escape_string($con, $shippingMethod);
 			$bandName = mysqli_real_escape_string($con, $idList);
 			$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE ID in ($idList)";
 				
@@ -232,16 +237,16 @@
 			echo '">';
 			
 			$shipping = 10;
-					echo 'Shipping Method: <select name="shipMethod" id="shipMethod" class="required">';
-					echo '<option >UPS</option>';
-					echo '<option >USPS</option>';
-					echo '<option >FedEx</option>';
-					echo '<option >Drone</option>';
-				echo '</select><br>';
+			echo 'Shipping Method: <select name="shipMethod" id="shipMethod" class="required">';
+				echo '<option >UPS</option>';
+				echo '<option >USPS</option>';
+				echo '<option >FedEx</option>';
+				echo '<option >Drone</option>';
+			echo '</select><br>';
 			echo "Shipping Cost: $<label id='shipCost'>" . $shipping . "</label><br>";
 			
 			$total = $subtotal + $shipping;
-			echo "Total Cost: $<label id='totalCost'>" . $total."</label><br><br>";
+			echo "Total Cost: $<label id='totalCost'>" . $total. "</label><br><br>";
 		
 			mysqli_close($con);
 			

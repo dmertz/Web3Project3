@@ -33,9 +33,13 @@
 				{
 					$idList = $idList . ",";
 				}
-				$idList = $idList . $token;;
+				if (is_numeric($token))
+					$idList = $idList . $token;
+					
 				$token = strtok( ",");	
-				$amounts[$x] = $token;
+				if (is_numeric($token))
+					$amounts[$x] = $token;
+					
 				$token = strtok( ",");
 				$x++;
 			}
