@@ -34,106 +34,123 @@
 		// Cookie is stored as comma separated values.
 		if(!isset($_COOKIE[$cookie_name])) 
 		{
-			// This really shouldn't happen.
+			// This really shouldn't happen, but it's possible the user deleted their cookies while on the page.
 			echo "There are no items in your shopping cart.<br>";
 			echo "Make sure you have cookies enabled.<br>";
 			echo "<a href='search.php'><button>Return to Search</button></a>";
+			exit;
 		}
-		else
-		{
-			$cookie_value = $_COOKIE[$cookie_name];
-			$token = strtok($cookie_value, ",");
-			
-			$amounts = array();
-			$idList = "";
-			$totalCost = $shippingCost;
-			$currentID = 0;
-			$currentAmount = 0;
 
-			while ($token !== false)
-			{
-				if ($idList != "")
-				{
-					$idList = $idList . ",";
-				}
-				if (is_numeric($token))
-					$idList = $idList . $token;
-					
-				$currentID = $token;
-				
-				$token = strtok( ",");
-				if (is_numeric($token))
-					$currentAmount = $token;
-				$amounts[$currentID] = $currentAmount;
-				
-				$token = strtok( ",");
-			}
+		$cookie_value = $_COOKIE[$cookie_name];
+		$token = strtok($cookie_value, ",");
 		
-			// Get price info from database
-			// Create connection
-			$con = mysqli_connect("localhost", "root", "", "project3");
-			
-			// Check connection
-			if (mysqli_connect_errno())
-				echo "Failed to connect to MySQL: " . mysqli_connect_error();
-			
-			$shippingMethod = mysqli_real_escape_string($con, $shippingMethod);
-			$bandName = mysqli_real_escape_string($con, $idList);
-			$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE ID in ($idList)";
-				
-			$result = mysqli_query($con, $sql_select);
-			
-			if(mysqli_errno($con))
-				echo mysqli_error($con);
-				
-			while($row = mysqli_fetch_array($result)) {
-				$totalCost = $totalCost + $row['Price'] * $amounts[$row['ID']];
+		$amounts = array();
+		$idList = "";
+		$totalCost = $shippingCost;
+		$currentID = 0;
+		$currentAmount = 0;
+
+		while ($token !== false)
+		{
+			if ($idList != "")
+			{
+				$idList = $idList . ",";
+			}
+			if (is_numeric($token))
+			{
+				$idList = $idList . $token;
+			}
+			else
+			{
+				// Either there's a hack or an error in the program.  Either way, abort.
+				echo "Oops!  There was a serious problem with your order.";
+				exit;
 			}
 				
-			// Insert record into Purchase table
-			$sql_insert = "INSERT INTO Purchase 
-			(CustomerID, OrderDate, ShipDate, ShippingMethod) VALUES 
-			(0, '" . date('Y/m/d') . "', '" . date('Y/m/d', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
+			$currentID = $token;
+			
+			$token = strtok( ",");
+			if (is_numeric($token) && $token >= 0)
+			{
+				$currentAmount = $token;
+			}
+			else
+			{
+				// Either there's a hack or an error in the program.  Either way, abort.
+				echo "Oops!  There was a serious problem with your order.";
+				exit;
+			}
 				
+			$amounts[$currentID] = $currentAmount;
+			
+			$token = strtok( ",");
+		}
+	
+		// Get price info from database
+		// Create connection
+		$con = mysqli_connect("localhost", "root", "", "project3");
+		
+		// Check connection
+		if (mysqli_connect_errno())
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
+		
+		$shippingMethod = mysqli_real_escape_string($con, $shippingMethod);
+		$bandName = mysqli_real_escape_string($con, $idList);
+		$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE ID in ($idList)";
+			
+		$result = mysqli_query($con, $sql_select);
+		
+		if(mysqli_errno($con))
+			echo mysqli_error($con);
+			
+		while($row = mysqli_fetch_array($result)) {
+			$totalCost = $totalCost + $row['Price'] * $amounts[$row['ID']];
+		}
+			
+		// Insert record into Purchase table
+		$sql_insert = "INSERT INTO Purchase 
+		(CustomerID, OrderDate, ShipDate, ShippingMethod) VALUES 
+		(0, '" . date('Y/m/d') . "', '" . date('Y/m/d', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
+			
+		mysqli_query($con, $sql_insert);
+		
+		if(mysqli_errno($con))
+			echo mysqli_error($con);
+		
+		// Gets the ID of the inserted row so we can use it in the other table.
+		$newID = mysql_insert_id();
+		
+		foreach($amounts as $productID => $quantity)
+		{			
+			$sql_insert = "INSERT INTO PurchaseProduct (PurchaseID, ProductID, Quantity) VALUES 
+			($newID, $productID, $quantity)";
 			mysqli_query($con, $sql_insert);
 			
 			if(mysqli_errno($con))
 				echo mysqli_error($con);
-			
-			// Gets the ID of the inserted row so we can use it in the other table.
-			$newID = mysql_insert_id();
-			
-			foreach($amounts as $productID => $quantity)
-			{			
-				$sql_insert = "INSERT INTO PurchaseProduct (PurchaseID, ProductID, Quantity) VALUES 
-				($newID, $productID, $quantity)";
-				mysqli_query($con, $sql_insert);
-				
-				if(mysqli_errno($con))
-					echo mysqli_error($con);
-			}
-			
-			mysqli_close($con);
-
-			setcookie($cookie_name, "", time() + (86400 * 30), "/"); // 86400 = 1 day
-
-			?>
-			<!DOCTYPE html>
-			<html>
-				<head>
-					<meta name="robots" content="noindex,nofollow" />
-					<meta charset="UTF-8">
-					<title>Check Out</title>
-					<link rel="stylesheet" type="text/css" href="style.css">
-				</head>
-				<body>
-					<h2>Music Store</h2>
-					<p>Thank you for your purchase!</p>
-					<a href='search.php'><button>Return to Search</button></a>
-				</body>
-			</html>
-			<?php
 		}
+		
+		mysqli_close($con);
+
+		setcookie($cookie_name, "", time() + (86400 * 30), "/"); // 86400 = 1 day
+
+		?>
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta name="robots" content="noindex,nofollow" />
+				<meta charset="UTF-8">
+				<title>Check Out</title>
+				<link rel="stylesheet" type="text/css" href="style.css">
+			</head>
+			<body>
+				<h2>Music Store</h2>
+				<p>Thank you for your purchase!</p>
+				<a href='search.php'><button>Return to Search</button></a>
+			</body>
+		</html>
+		<?php
+		
 	}
 	else
 	{
