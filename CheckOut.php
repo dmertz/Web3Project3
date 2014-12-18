@@ -75,8 +75,6 @@
 				
 			$bandName = mysqli_real_escape_string($con, $idList);
 			$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE ID in ($idList)";
-			
-			echo " SQL = " . $sql_select;
 				
 			$result = mysqli_query($con, $sql_select);
 			
@@ -90,9 +88,7 @@
 			// Insert record into Purchase table
 			$sql_insert = "INSERT INTO Purchase 
 			(CustomerID, OrderDate, ShipDate, ShippingMethod) VALUES 
-			(0, '" . date('m/d/y') . "', '" . date('m/d/y', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
-			
-			echo "<br>" . $sql_insert . "<br>";
+			(0, '" . date('Y/m/d') . "', '" . date('Y/m/d', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
 				
 			mysqli_query($con, $sql_insert);
 			
