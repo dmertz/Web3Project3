@@ -108,7 +108,7 @@
 		}
 			
 		// Insert record into Purchase table
-		$sql_insert = "INSERT INTO Purchase 
+		$sql_insert = "INSERT INTO purchase 
 		(CustomerID, OrderDate, ShipDate, ShippingMethod) VALUES 
 		(0, '" . date('Y/m/d') . "', '" . date('Y/m/d', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
 			
@@ -118,11 +118,11 @@
 			echo mysqli_error($con);
 		
 		// Gets the ID of the inserted row so we can use it in the other table.
-		$newID = mysql_insert_id();
+		$newID = mysqli_insert_id($con);
 		
 		foreach($amounts as $productID => $quantity)
 		{			
-			$sql_insert = "INSERT INTO PurchaseProduct (PurchaseID, ProductID, Quantity) VALUES 
+			$sql_insert = "INSERT INTO purchaseproduct (PurchaseID, ProductID, Quantity) VALUES 
 			($newID, $productID, $quantity)";
 			mysqli_query($con, $sql_insert);
 			
