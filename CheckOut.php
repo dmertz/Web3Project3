@@ -1,54 +1,150 @@
 <?php
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
-		$theID = $_POST['theID'];
-		$quantity = $_POST['quantityToBuy'];
+		$shippingMethod = $_POST['shipMethod'];
+		$shippingCost = 10; // This ensures that nobody can get free shipping by manipulating the Post variable.
+		
+		switch ($shippingMethod)
+			{
+				case "UPS":
+				{
+					$shippingCost = 10;
+					break;
+				}
+				case "USPS":
+				{
+					$shippingCost = 11.32;
+					break;
+				}
+				case "FedEx":
+				{
+					$shippingCost = 12;
+					break;
+				}
+				case "Drone":
+				{
+					$shippingCost = 100;
+					break;
+				}
+			}
 		
 		$cookie_name = "ShoppingCart";
 		$cookie_value = "";
-		$newCookieValue = "";
-		$wasUpdated = false;
 		
 		// Cookie is stored as comma separated values.
-		if(isset($_COOKIE[$cookie_name])) {
+		if(!isset($_COOKIE[$cookie_name])) 
+		{
+			// This really shouldn't happen.
+			echo "There are no items in your shopping cart.<br>";
+			echo "Make sure you have cookies enabled.<br>";
+			echo "<a href='search.php'><button>Return to Search</button></a>";
+		}
+		else
+		{
 			$cookie_value = $_COOKIE[$cookie_name];
-
-			// Check if this item is already in the cart.
 			$token = strtok($cookie_value, ",");
+			
+			$amounts = array();
+			$idList = "";
+			$totalCost = $shippingCost;
+			$currentID = 0;
+			$currentAmount = 0;
 
 			while ($token !== false)
 			{
-				if ($newCookieValue != "")
+				if ($idList != "")
 				{
-					$newCookieValue = $newCookieValue . ",";
+					$idList = $idList . ",";
 				}
-				$newCookieValue = $newCookieValue . $token;
+				$idList = $idList . $token;
+				$currentID = $token;
 				
-				if ($token == $theID)
-				{
-					$token = strtok( ",");
-					// Update the amount
-					$wasUpdated = true;
-					$newCookieValue = $newCookieValue . "," . $quantity;
-				}
-				else
-				{
-					$token = strtok( ",");
-					$newCookieValue = $newCookieValue . "," . $token;
-				}
+				$token = strtok( ",");
+				$currentAmount = $token;
+				$amounts[$currentID] = $currentAmount;
+				
 				$token = strtok( ",");
 			}
-		}
-		if (!$wasUpdated)
-		{
-			if ($newCookieValue != "")
-			{
-				$newCookieValue = $newCookieValue . ",";
-			}
-			$newCookieValue = $newCookieValue . $theID . "," . $quantity;
-		}
-		setcookie($cookie_name, $newCookieValue, time() + (86400 * 30), "/"); // 86400 = 1 day
 		
-		header("Location:search.php?theID=" . $theID);
+			// Get price info from database
+			//Create connection
+			$con = mysqli_connect("localhost", "root", "", "project3");
+			
+			// Check connection
+			if (mysqli_connect_errno())
+				echo "Failed to connect to MySQL: " . mysqli_connect_error();
+				
+			$bandName = mysqli_real_escape_string($con, $idList);
+			$sql_select = "SELECT ID, BandName, AlbumName, Format, Description, Price, QuantityAvailable FROM product WHERE ID in ($idList)";
+			
+			echo " SQL = " . $sql_select;
+				
+			$result = mysqli_query($con, $sql_select);
+			
+			if(mysqli_errno($con))
+				echo mysqli_error($con);
+				
+			while($row = mysqli_fetch_array($result)) {
+				$totalCost = $totalCost + $row['Price'] * $amounts[$row['ID']];
+			}
+				
+			// Insert record into Purchase table
+			//Table: Purchase
+		    //ID
+		    //CustomerID
+		    //OrderDate
+		    //ShipDate
+		    //ShippingMethod (UPS, USPS, FedEx)
+			
+			// Table: PurchaseProduct
+			// PurchaseID
+			// ProductID
+			// Quantity
+			
+			$sql_insert = "INSERT INTO Purchase 
+			(CustomerID, OrderDate, ShipDate, ShippingMethod) VALUES 
+			(0, '" . date('m/d/y') . "', '" . date('m/d/y', time() + (86400 * 10)) . "', '" . $shippingMethod . "')";
+			
+			echo "<br>" . $sql_insert . "<br>";
+				
+			mysqli_query($con, $sql_insert);
+			
+			if(mysqli_errno($con))
+				echo mysqli_error($con);
+			
+			// Gets the ID of the inserted row so we can use it in the other table.
+			$newID = mysql_insert_id();
+			
+			foreach($amounts as $productID => $quantity)
+			{			
+				$sql_insert = "INSERT INTO PurchaseProduct (PurchaseID, ProductID, Quantity) VALUES 
+				($newID, $productID, $quantity)";
+				mysqli_query($con, $sql_insert);
+				
+				if(mysqli_errno($con))
+					echo mysqli_error($con);
+			}
+			
+			mysqli_close($con);
+
+			setcookie($cookie_name, "", time() + (86400 * 30), "/"); // 86400 = 1 day
+			//header("Location:search.php?theID=" . $theID);
+			?>
+			<!DOCTYPE html>
+			<html>
+				<head>
+					<meta name="robots" content="noindex,nofollow" />
+					<meta charset="UTF-8">
+					<title>Check Out</title>
+					<link rel="stylesheet" type="text/css" href="style.css">
+				</head>
+				<body>
+					<h2>Music Store</h2>
+					<p>Thank you for your purchase!</p>
+					<a href='search.php'><button>Return to Search</button></a>
+				</body>
+			</html>
+			<?php
+		}
 	}
 	else
 	{
@@ -161,9 +257,12 @@
 			echo "Shipping Cost: $<label id='shipCost'>" . $shipping . "</label><br>";
 			
 			$total = $subtotal + $shipping;
-			echo "Total Cost: $<label id='totalCost'>" . $total."</label>";
+			echo "Total Cost: $<label id='totalCost'>" . $total."</label><br><br>";
 		
 			mysqli_close($con);
+			//echo "<a href='CheckOut.php?final=true'><button>Finish Checkout</button></a>";
+			echo "<input type='submit' value='Finish Checkout'></input>";
+			echo "</form>";
 	}
 ?>
 		<script>
@@ -200,7 +299,6 @@
 			?>
 		};
 		</script>
-		</form>
 		<br>
 		<a href='search.php'><button>Return to Search</button></a>
 	</body>
