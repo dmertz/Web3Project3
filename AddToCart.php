@@ -66,6 +66,11 @@
 		<?php
 	
 		$theID = $_GET['theID'];
+		$quantity = 1;
+		if (isset($_GET['quantityToBuy']))
+		{
+			$quantity = $_GET['quantityToBuy'];
+		}
 
 		//Create connection
 		$con = mysqli_connect("localhost", "root", "", "project3");
@@ -94,7 +99,7 @@
 		echo "Description: " . $row['Description'] . "<br>";
 		echo "Format: " . $row['Format'] . "<br>" ;
 
-		echo 'Quantity to buy: <input type="text" name="quantityToBuy" value="1"><br>';
+		echo 'Quantity to buy: <input type="text" name="quantityToBuy" value="' . $quantity . '"><br>';
 		echo '<input type="hidden" name="theID" value="' . $theID . '"></input>';
 		echo '<input type="submit" value="Add To Cart"></input>';
 	}
